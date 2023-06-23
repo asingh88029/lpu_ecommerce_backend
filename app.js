@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const productRouter = require("./routes/product.route");
+const userRouter = require("./routes/user.route");
 
 const app = express();
 
@@ -16,6 +17,14 @@ mongoose.connect(mongoURI,{ useNewUrlParser: true, useUnifiedTopology: true }).t
 })
 
 app.use("/product",productRouter);
+
+app.use('/user',userRouter);
+
+app.use((req,res)=>{
+    res.status(404).send({
+        message:"API endpoint not found."
+    })
+})
 
 app.listen(9000,()=>{
     console.log("Your Server is started on port 9000")
