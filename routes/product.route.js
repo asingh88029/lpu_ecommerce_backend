@@ -1,11 +1,13 @@
 const express = require('express');
-const {addProductController,getAllProductController,updateProductController} = require('../controllers/product.controller');
+const {addProductController,getOneProductController,getAllProductController,updateProductController} = require('../controllers/product.controller');
 
 const router = express.Router();
 
 router.post('/',addProductController);
 
-router.get('/',getAllProductController);
+router.get('/all',getAllProductController);
+
+router.get('/:id',getOneProductController);
 
 router.put('/:id',updateProductController);
 

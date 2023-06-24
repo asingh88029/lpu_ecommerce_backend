@@ -1,7 +1,7 @@
-const ProductModel = require("../models/product.model");
+const Product = require("../models/product.model");
 
 async function addProductService(productData){
-    const product = await ProductModel.create(productData);
+    const product = await Product.create(productData);
     if(product){
         return {
             success:true,
@@ -17,7 +17,7 @@ async function addProductService(productData){
 }
 
 async function getAllProductService(){
-    const products = await ProductModel.find();
+    const products = await Product.find();
     if(products){
         return {
             success:true,
@@ -32,9 +32,25 @@ async function getAllProductService(){
     }
 }
 
+async function getOneProductService(id){
+    const product = await Product.findById(id);
+    if(product){
+        return {
+            success:true,
+            message:"Product are sent",
+            data:product
+        }
+    }else{
+        return {
+            success:false,
+            message:"Product are not available"
+        }
+    }
+}
+
 async function updateProductService(id,updatedProduct){
     console.log(id,updatedProduct)
-    const product = await ProductModel.findByIdAndUpdate(id,updatedProduct,{new:true});
+    const product = await Product.findByIdAndUpdate(id,updatedProduct,{new:true});
     console.log(product)
     if(product){
         return {
@@ -53,5 +69,6 @@ async function updateProductService(id,updatedProduct){
 module.exports = {
     addProductService,
     getAllProductService,
-    updateProductService
+    updateProductService,
+    getOneProductService
 }

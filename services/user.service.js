@@ -1,7 +1,7 @@
-const UserModel = require("../models/user.model");
+const User = require("../models/user.model");
 
 async function addUserService(userData){
-    const user = await UserModel.create(userData);
+    const user = await User.create(userData);
     if(user){
         return {
             success:true,
@@ -17,7 +17,7 @@ async function addUserService(userData){
 }
 
 async function getOneUserService(id){
-    const user = await UserModel.findById(id);
+    const user = await User.findById(id);
     if(user){
         return {
             success:true,
@@ -34,7 +34,7 @@ async function getOneUserService(id){
 
 
 async function getAllUserService(){
-    const users = await UserModel.find();
+    const users = await User.find();
     if(users){
         return {
             success:true,
@@ -50,7 +50,7 @@ async function getAllUserService(){
 }
 
 async function updateUserService(id,updatedUser){
-    const user = await UserModel.findByIdAndUpdate(id,updatedUser,{new:true});
+    const user = await User.findByIdAndUpdate(id,updatedUser,{new:true});
     if(user){
         return {
             success:true,

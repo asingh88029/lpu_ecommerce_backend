@@ -1,4 +1,4 @@
-const {addProductService,getAllProductService,updateProductService} = require("../services/product.service");
+const {addProductService,getAllProductService,getOneProductService,updateProductService} = require("../services/product.service");
 
 
 
@@ -37,6 +37,25 @@ async function getAllProductController(req,res){
 
 }
 
+async function getOneProductController(req,res){
+
+    const id = req.params.id;
+
+    const serviceData = await getOneProductService(id);
+
+    if(serviceData.success){
+        res.status(200).send({
+            message:serviceData.message,
+            data:serviceData.data
+        })
+    }else{
+        res.status(500).send({
+            message:serviceData.message
+        })
+    }
+
+}
+
 async function updateProductController(req,res){
 
     const id = req.params.id;
@@ -61,5 +80,6 @@ async function updateProductController(req,res){
 module.exports = {
     addProductController,
     getAllProductController,
-    updateProductController
+    updateProductController,
+    getOneProductController
 };

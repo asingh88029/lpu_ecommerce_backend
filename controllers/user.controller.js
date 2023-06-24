@@ -41,7 +41,6 @@ async function getOneUserController(req,res){
 
 async function getAllUserController(req,res){
 
-    console.log("I am working")
 
     const serviceData = await getAllUserService();
 
