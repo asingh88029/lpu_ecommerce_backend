@@ -17,7 +17,7 @@ async function addCartService(cartData){
 }
 
 async function getAllCartService(){
-    const carts = await Cart.find();
+    const carts = await Cart.find().populate('uid','name email mobile').populate('pid','name price rating');
     if(carts){
         return {
             success:true,
