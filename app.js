@@ -4,6 +4,7 @@ const productRouter = require("./routes/product.route");
 const userRouter = require("./routes/user.route");
 const cartRouter = require('./routes/cart.route');
 const addressRouter = require('./routes/shippingAdd.route');
+const orderRouter = require('./routes/order.route');
 
 const app = express();
 
@@ -25,6 +26,8 @@ app.use('/user',userRouter);
 app.use('/cart',cartRouter);
 
 app.use('/shippingAdd',addressRouter);
+
+app.use('/order',orderRouter);
 
 app.use((req,res)=>{
     res.status(404).send({
