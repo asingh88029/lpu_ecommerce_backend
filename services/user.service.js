@@ -16,6 +16,22 @@ async function addUserService(userData){
     }
 }
 
+async function findUserByEmailService(email){
+    const user = await User.findOne({email});
+    if(user){
+        return {
+            success:true,
+            message:"User Found",
+            data:user
+        }
+    }else{
+        return {
+            success:false,
+            message:"User not found"
+        }
+    }
+}
+
 async function getOneUserService(id){
     const user = await User.findById(id);
     if(user){
@@ -67,6 +83,7 @@ async function updateUserService(id,updatedUser){
 
 module.exports = {
     addUserService,
+    findUserByEmailService,
     getOneUserService,
     getAllUserService,
     updateUserService,
