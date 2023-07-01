@@ -1,14 +1,15 @@
 const mongoose = require('mongoose');
 
 const productSchema = mongoose.Schema({
-    pid:{
-        type:String,
-        unique:true,
-        require:true
-    },
     name:String,
     price:Number,
-    rating:Number
+    rating:Number,
+    imagesURL:[{
+        type:String
+    }],
+    description:{
+        type:String
+    }
 })
 
 const Product = mongoose.model('Product',productSchema);

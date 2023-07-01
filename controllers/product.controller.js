@@ -1,85 +1,112 @@
-const {addProductService,getAllProductService,getOneProductService,updateProductService} = require("../services/product.service");
+const {
+  addProductService,
+  getAllProductService,
+  getOneProductService,
+  updateProductService,
+} = require("../services/product.service");
+
+const cloudinary = require("cloudinary");
+
+cloudinary.config({
+  cloud_name: "ddbryywjd",
+  api_key: "783413234336681",
+  api_secret: "2BS7DfxpFuhcJ3j0DFy3owRRnVA",
+});
+
+async function addProductController(req, res) {
+
+  const { name, price, rating, description } = req.body;
+
+  const images = req.files;
 
 
+  //Code to upload all the images to cloudinary server.
 
-async function addProductController(req,res){
-    const newProduct = req.body;
+  const cloudinaryResult = await Promise.all(
+    images.map(async (image)=>{
+        const result = await cloudinary.v2.uploader.upload(image.path);
+        return result.secure_url
+    })
+  )
 
-    const serviceData = await addProductService(newProduct);
+  console.log(cloudinaryResult)
 
-    if(serviceData.success){
-        res.status(200).send({
-            message:serviceData.message,
-            data:serviceData.data
-        })
-    }else{
-        res.status(500).send({
-            message:serviceData.message
-        })
-    }
+  const newProduct = {
+    name,
+    price,
+    rating,
+    description,
+    imagesURL:cloudinaryResult
+  };
 
+  const serviceData = await addProductService(newProduct);
+
+  if (serviceData.success) {
+    res.status(200).send({
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  } else {
+    res.status(500).send({
+      message: serviceData.message,
+    });
+  }
 }
 
-async function getAllProductController(req,res){
+async function getAllProductController(req, res) {
+  const serviceData = await getAllProductService();
 
-    const serviceData = await getAllProductService();
-
-    if(serviceData.success){
-        res.status(200).send({
-            message:serviceData.message,
-            data:serviceData.data
-        })
-    }else{
-        res.status(500).send({
-            message:serviceData.message
-        })
-    }
-
+  if (serviceData.success) {
+    res.status(200).send({
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  } else {
+    res.status(500).send({
+      message: serviceData.message,
+    });
+  }
 }
 
-async function getOneProductController(req,res){
+async function getOneProductController(req, res) {
+  const id = req.params.id;
 
-    const id = req.params.id;
+  const serviceData = await getOneProductService(id);
 
-    const serviceData = await getOneProductService(id);
-
-    if(serviceData.success){
-        res.status(200).send({
-            message:serviceData.message,
-            data:serviceData.data
-        })
-    }else{
-        res.status(500).send({
-            message:serviceData.message
-        })
-    }
-
+  if (serviceData.success) {
+    res.status(200).send({
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  } else {
+    res.status(500).send({
+      message: serviceData.message,
+    });
+  }
 }
 
-async function updateProductController(req,res){
+async function updateProductController(req, res) {
+  const id = req.params.id;
 
-    const id = req.params.id;
+  const updatedProductData = req.body;
 
-    const updatedProductData = req.body;
+  const serviceData = await updateProductService(id, updatedProductData);
 
-    const serviceData = await updateProductService(id,updatedProductData)
-
-    if(serviceData.success){
-        res.status(200).send({
-            message:serviceData.message,
-            data:serviceData.data
-        })
-    }else{
-        res.status(500).send({
-            message:serviceData.message
-        })
-    }
-
+  if (serviceData.success) {
+    res.status(200).send({
+      message: serviceData.message,
+      data: serviceData.data,
+    });
+  } else {
+    res.status(500).send({
+      message: serviceData.message,
+    });
+  }
 }
 
 module.exports = {
-    addProductController,
-    getAllProductController,
-    updateProductController,
-    getOneProductController
+  addProductController,
+  getAllProductController,
+  updateProductController,
+  getOneProductController,
 };
