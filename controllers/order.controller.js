@@ -14,8 +14,7 @@ async function addOrderContoller(req, res){
     console.log(totalPrice)
 
     // orderData.totalPrice = totalPrice;
-    orderData.totalPrice = 599
-    // We have a bug here: getting promise  
+    orderData.totalPrice = 599 
     
     
     let orderServiceData = await addOrderService(orderData)

@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const jwt = require('jsonwebtoken')
 const {addUserService,findUserByEmailService,getOneUserService,getAllUserService,updateUserService} = require("../services/user.service");
+const sendEmail = require('./../utils/email');
 
 const secretKey = 'khdghkgjdhgjdgy286779163fehjwwvjhdegvjhgitye7826378363kjbek';
 
@@ -39,6 +40,11 @@ async function addUserController(req,res){
         const serviceData = await addUserService(newUser);
 
         if(serviceData.success){
+
+            const text = "Hello "+ serviceData.data.name + "!,"+"\n"+"You are registered succesfully."+"\n"+"Thanks,\n"+"LPUKart Team"
+
+            sendEmail(serviceData.data.email,"You are registered successfully",text)
+
             res.status(200).send({
                 message:serviceData.message,
                 data:serviceData.data
