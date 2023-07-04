@@ -1,9 +1,10 @@
 const httpStatus = require('http-status');
+const config = require('./../config/config')
 const jwt = require('jsonwebtoken')
-const {addUserService,findUserByEmailService,getOneUserService,getAllUserService,updateUserService} = require("../services/user.service");
+const {addUserService,forgotPasswordService,findUserByEmailService,getOneUserService,getAllUserService,updateUserService} = require("../services/user.service");
 const sendEmail = require('./../utils/email');
 
-const secretKey = 'khdghkgjdhgjdgy286779163fehjwwvjhdegvjhgitye7826378363kjbek';
+const secretKey = config.JWT_SECRET_KEY;
 
 const bcrypt = require('bcryptjs'); 
 
@@ -113,6 +114,52 @@ async function authenticationController(req,res){
 
 }
 
+async function forgotPasswordController(req,res){
+
+    const {email} = req.body;
+
+    if(email){
+
+        const userServiceData = await findUserByEmailService(email);
+
+        if(!userServiceData.success){
+            return res.status(httpStatus.UNAUTHORIZED).send({
+                message:'User not found'
+            })
+        }
+
+        const user = userServiceData.data;
+
+        const otp = Math.floor(100000 + Math.random()*900000); // 100000-999999
+
+        const otpExpireTime = Date.now() + (15 * 60 * 1000);
+
+        const forgotServiceData = await forgotPasswordService(user.email,otp,otpExpireTime);
+
+
+
+        if(forgotServiceData){
+
+            const text = "Your OTP to reset password is "+otp+" ."+"\n\nYour OTP will expire in "+Date(otpExpireTime)+" "
+            
+            sendEmail(user.email,"OTP for password reset",text)
+
+            return res.status(httpStatus.CREATED).send({
+                message:"Your OTP is successfully sent to the registered email id."
+            })
+        }else{
+            return res.status(httpStatus.CREATED).send({
+                message:"Something went wrong"
+            })
+        }
+    }else{
+        res.status(httpStatus.BAD_REQUEST).send({
+            message:"Email is missing"
+        })
+    }
+
+}
+
 async function getOneUserController(req,res){
 
     const id = req.params.id;
@@ -174,6 +221,7 @@ async function updateUserController(req,res){
 module.exports = {
     addUserController,
     authenticationController,
+    forgotPasswordController,
     getOneUserController,
     getAllUserController,
     updateUserController

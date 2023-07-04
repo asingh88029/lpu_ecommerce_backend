@@ -32,6 +32,27 @@ async function findUserByEmailService(email){
     }
 }
 
+async function forgotPasswordService(email,otp,otpExpireTime){
+
+    const user = await User.findOne({email});
+
+    console.log(user)
+
+    const updatedUserData = {
+        otp,
+        otpExpireTime
+    }
+
+    const newUser = await User.findByIdAndUpdate(user._id,updatedUserData,{new:true})
+
+    if(newUser){
+        return {
+            success:true,
+            message:"OTP Added in database."
+        }
+    }
+}
+
 async function getOneUserService(id){
     const user = await User.findById(id);
     if(user){
@@ -84,6 +105,7 @@ async function updateUserService(id,updatedUser){
 module.exports = {
     addUserService,
     findUserByEmailService,
+    forgotPasswordService,
     getOneUserService,
     getAllUserService,
     updateUserService,

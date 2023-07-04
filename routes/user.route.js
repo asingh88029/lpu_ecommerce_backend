@@ -1,5 +1,5 @@
 const express = require('express');
-const {addUserController,authenticationController,getOneUserController,getAllUserController,updateUserController} = require('../controllers/user.controller');
+const {addUserController,forgotPasswordController,authenticationController,getOneUserController,getAllUserController,updateUserController} = require('../controllers/user.controller');
 const Authorization = require('./../middlewares/Authorization')
 const router = express.Router();
 
@@ -13,6 +13,16 @@ router.post('/register',addUserController);
 /user/login
 */
 router.post('/login',authenticationController);
+
+/*
+/user/forgot-password
+*/
+router.post('/forgot-password',forgotPasswordController);
+
+/*
+/user/reset-password
+*/
+router.post('/reset-password');
 
 
 /*

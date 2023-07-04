@@ -1,4 +1,5 @@
 const express = require('express');
+const config = require('./config/config')
 const cors = require('cors')
 const mongoose = require('mongoose');
 const productRouter = require("./routes/product.route");
@@ -14,7 +15,7 @@ app.use(express.json());
 // globally
 app.use(cors())
 
-const mongoURI = "Your mongoURI";
+const mongoURI = config.MONGO_URI;
 
 mongoose.connect(mongoURI,{ useNewUrlParser: true, useUnifiedTopology: true }).then(()=>{
     console.log("MongoDB Connected")

@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+const config = require('./../config/config')
 
 let mailTransport = nodemailer.createTransport({
   service: "gmail",
@@ -6,8 +7,8 @@ let mailTransport = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "yourgmail@gmail.com",
-    pass: "useyourapppasswordgenerated",
+    user: config.GMAIL_APP_USER,
+    pass: config.GMAIL_APP_PASSWORD,
   },
 });
 
