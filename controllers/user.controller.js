@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const config = require('./../config/config')
 const jwt = require('jsonwebtoken')
-const {addUserService,forgotPasswordService,findUserByEmailService,getOneUserService,getAllUserService,updateUserService} = require("../services/user.service");
+const {addUserService,forgotPasswordService,resetPasswordService,findUserByEmailService,getOneUserService,getAllUserService,updateUserService} = require("../services/user.service");
 const sendEmail = require('./../utils/email');
 
 const secretKey = config.JWT_SECRET_KEY;
@@ -132,7 +132,7 @@ async function forgotPasswordController(req,res){
 
         const otp = Math.floor(100000 + Math.random()*900000); // 100000-999999
 
-        const otpExpireTime = Date.now() + (15 * 60 * 1000);
+        const otpExpireTime = new Date(Date.now() + (15 * 60 * 1000));
 
         const forgotServiceData = await forgotPasswordService(user.email,otp,otpExpireTime);
 
@@ -140,7 +140,7 @@ async function forgotPasswordController(req,res){
 
         if(forgotServiceData){
 
-            const text = "Your OTP to reset password is "+otp+" ."+"\n\nYour OTP will expire in "+Date(otpExpireTime)+" "
+            const text = "Your OTP to reset password is "+otp+" ."+"\n\nYour OTP will expire in "+otpExpireTime+" "
             
             sendEmail(user.email,"OTP for password reset",text)
 
@@ -155,6 +155,50 @@ async function forgotPasswordController(req,res){
     }else{
         res.status(httpStatus.BAD_REQUEST).send({
             message:"Email is missing"
+        })
+    }
+
+}
+
+async function resetPasswordController(req,res){
+
+    const {otp,email,password} = req.body;
+
+    if(email && otp && password){
+
+        const userServiceData = await findUserByEmailService(email);
+
+        if(!userServiceData.success){
+            return res.status(httpStatus.UNAUTHORIZED).send({
+                message:'User not found'
+            })
+        }
+
+        const user = userServiceData.data;
+
+         // encrypt the password
+        const encryPassword = await bcrypt.hash(password,10);
+
+
+        const resetServiceData = await resetPasswordService(email,otp,encryPassword);
+
+        if(resetServiceData.success){
+
+            const text = "Hello "+user.name+",\n\n"+"Your password is updated successfully.\n"+"If you haven't updated the password, ping us on this mail ASAP.\n Thanks,\n Team LPUKart"
+            
+            sendEmail(user.email,"Password Updated",text)
+
+            return res.status(httpStatus.CREATED).send({
+                message:"Your Password is updated successfully."
+            })
+        }else{
+            return res.status(httpStatus.CREATED).send({
+                message:resetServiceData.message
+            })
+        }
+    }else{
+        res.status(httpStatus.BAD_REQUEST).send({
+            message:"Email or OTP or Passwword is missing"
         })
     }
 
@@ -222,6 +266,7 @@ module.exports = {
     addUserController,
     authenticationController,
     forgotPasswordController,
+    resetPasswordController,
     getOneUserController,
     getAllUserController,
     updateUserController

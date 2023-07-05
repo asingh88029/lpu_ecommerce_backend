@@ -53,6 +53,44 @@ async function forgotPasswordService(email,otp,otpExpireTime){
     }
 }
 
+async function resetPasswordService(email,otp,password){
+
+    const user = await User.findOne({
+        email,
+        otp
+    });
+
+    if(user){
+        const expiryCheck = Date.now()<new Date(user.otpExpireTime).getTime();
+        if(!expiryCheck){
+            return {
+                success:false,
+                message:"OTP Expired"
+            } 
+        }
+    }else{
+        return {
+            success:false,
+            message:"OTP Invalid"
+        }
+    }
+
+    const updatedUserData = {
+        password:password,
+        otp:null,
+        otpExpireTime:null
+    }
+
+    const newUser = await User.findByIdAndUpdate(user._id,updatedUserData,{new:true})
+
+    if(newUser){
+        return {
+            success:true,
+            message:"Password Updated Successfully."
+        }
+    }
+}
+
 async function getOneUserService(id){
     const user = await User.findById(id);
     if(user){
@@ -106,6 +144,7 @@ module.exports = {
     addUserService,
     findUserByEmailService,
     forgotPasswordService,
+    resetPasswordService,
     getOneUserService,
     getAllUserService,
     updateUserService,
