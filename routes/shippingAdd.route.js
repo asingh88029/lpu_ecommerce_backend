@@ -1,13 +1,14 @@
 const express = require('express');
+const Authorization = require('./../middlewares/Authorization');
 const {addAddressController,updateAddressController,getAllAddressController} = require('../controllers/shippingAdd.controller');
 
 const router = express.Router();
 
-router.post('/',addAddressController);
+router.post('/',Authorization(['customer']),addAddressController);
 
-router.get('/',getAllAddressController);
+router.get('/',Authorization(['admin']),getAllAddressController);
 
-router.put('/:id',updateAddressController);
+router.put('/:id',Authorization(['customer']),updateAddressController);
 
 
 module.exports = router;

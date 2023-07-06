@@ -48,8 +48,25 @@ async function updateAddressService(aid,updatedAddress){
     }
 }
 
+async function findAddressByuserIdandAidService(uid,aid){
+    const address = await Address.findOne({user:uid,_id:aid});
+    if(address){
+        return {
+            success:true,
+            message:"Address is found",
+            data:address
+        }
+    }else{
+        return {
+            success:false,
+            message:"Address is not found"
+        }
+    }
+}
+
 module.exports = {
     addAddressService,
     getAllAddressService,
+    findAddressByuserIdandAidService,
     updateAddressService
 }

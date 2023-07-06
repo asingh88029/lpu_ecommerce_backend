@@ -39,7 +39,7 @@ router.get('/:id',Authorization(['admin','customer']),getOneUserController);
 /*
 /user/6494659bee473020415c02e0
 */
-router.put('/:id',updateUserController);
+router.put('/:id',Authorization(['customer']),updateUserController);
 
 
 module.exports = router;

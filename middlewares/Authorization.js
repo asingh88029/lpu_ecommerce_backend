@@ -7,7 +7,7 @@ const secretKey = config.JWT_SECRET_KEY;
 
 const Authorization = (roles) => (req, res, next) => {
 
-   console.log("Request coming") 
+  console.log("Request coming") 
 
   const token = req.header("Authorization");
 
@@ -40,6 +40,7 @@ const Authorization = (roles) => (req, res, next) => {
 
     req.userId= decode.userId,
     req.email=decode.email
+    req.role = decode.role
 
     next();
   } catch (err) {
