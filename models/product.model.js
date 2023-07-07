@@ -9,7 +9,17 @@ const productSchema = mongoose.Schema({
     }],
     description:{
         type:String
-    }
+    },
+    quantity:{
+        type:Number,
+        require:true
+    },
+    category:[{
+        type:String
+    }],
+    tags:[{
+        type:String
+    }]
 })
 
 const Product = mongoose.model('Product',productSchema);

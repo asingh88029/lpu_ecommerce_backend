@@ -1,3 +1,4 @@
+const { json } = require("express");
 const {
   addProductService,
   getAllProductService,
@@ -15,7 +16,12 @@ cloudinary.config({
 
 async function addProductController(req, res) {
 
-  const { name, price, rating, description } = req.body;
+  const { name, price, rating, description, quantity} = req.body;
+
+  let {tags,category } = req.body;
+
+  tags = JSON.parse(tags);
+  category = JSON.parse(category);
 
   const images = req.files;
 
@@ -29,14 +35,15 @@ async function addProductController(req, res) {
     })
   )
 
-  console.log(cloudinaryResult)
-
   const newProduct = {
     name,
     price,
     rating,
     description,
-    imagesURL:cloudinaryResult
+    imagesURL:cloudinaryResult,
+    tags,
+    quantity,
+    category
   };
 
   const serviceData = await addProductService(newProduct);
@@ -86,9 +93,67 @@ async function getOneProductController(req, res) {
 }
 
 async function updateProductController(req, res) {
+
   const id = req.params.id;
 
-  const updatedProductData = req.body;
+  const {name,price,rating,description} = req.body;
+
+  let {tags,category} = req.body;
+
+
+  const updatedProductData = {}
+
+
+  if(tags!==undefined){
+    tags = JSON.parse(tags);
+    if(tags.length){
+      updatedProductData.tags = tags
+    }
+  }
+
+
+  if(category!==undefined){
+    category = JSON.parse(category);
+    if(category.length){
+      updatedProductData.category = category
+    }
+  }
+
+
+  
+
+  if(name){
+    updatedProductData.name=name
+  }
+
+  if(price){
+    updatedProductData.price = price
+  }
+
+  if(rating){
+    updatedProductData.rating = rating
+  }
+
+  if(description){
+    updatedProductData.description = description
+  }
+  
+
+  const images = req.files;
+
+
+  //Code to upload all the images to cloudinary server.
+
+  const cloudinaryResult = await Promise.all(
+    images.map(async (image)=>{
+        const result = await cloudinary.v2.uploader.upload(image.path);
+        return result.secure_url
+    })
+  )
+
+  if(cloudinaryResult.length){
+    updatedProductData.imagesURL = cloudinaryResult
+  }
 
   const serviceData = await updateProductService(id, updatedProductData);
 

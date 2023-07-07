@@ -9,13 +9,13 @@ const {addProductController,getOneProductController,getAllProductController,upda
 
 const router = express.Router();
 
-router.post('/',Authorization('admin'),upload.array('images',5),addProductController);
+router.post('/',Authorization(['admin']),upload.array('images',5),addProductController);
 
 router.get('/all',getAllProductController);
 
 router.get('/:id',getOneProductController);
 
-router.put('/:id',Authorization('admin'),updateProductController);
+router.put('/:id',Authorization(['admin']),upload.array('images',5),updateProductController);
 
 
 module.exports = router;
