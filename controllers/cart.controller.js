@@ -1,5 +1,5 @@
 const httpStatus = require("http-status");
-const {addCartService,getAllCartService,updateCartService} = require("../services/cart.service");
+const {addCartService,getAllCartService,getUserCartService,updateCartService} = require("../services/cart.service");
 
 
 
@@ -64,32 +64,74 @@ async function getUserCartController(req,res){
 
     const uid = req.params.id;
 
-    if(uid!=req.userId){
-        return res.status(httpStatus.UNAUTHORIZED).send({
-            message:"You are not allowed to see someone's cart details."
+    if(uid){
+
+        if(uid!=req.userId){
+            return res.status(httpStatus.UNAUTHORIZED).send({
+                message:"You are not allowed to see someone's cart details."
+            })
+        }
+
+        const serviceData = await getUserCartService(uid);
+
+        if(serviceData.success){
+            return res.status(httpStatus.OK).send({
+                message:serviceData.message,
+                data:serviceData.data
+            })
+        }else{
+            return res.status(httpStatus.BAD_REQUEST).send({
+                message:serviceData.message
+            })
+        }
+
+
+    }else{
+
+        return res.status(httpStatus.BAD_REQUEST).send({
+            message:"UserId is missing."
         })
+
     }
-
-
 
 }
 
 async function updateCartController(req,res){
 
-    const id = req.params.id;
+    const uid = req.params.id;
 
-    const updatedCartData = req.body;
+    const {pid,qty} = req.body;
 
-    const serviceData = await updateCartService(id,updatedCartData)
+    if(uid && pid && qty){
 
-    if(serviceData.success){
-        res.status(200).send({
-            message:serviceData.message,
-            data:serviceData.data
-        })
+        if(uid!=req.userId){
+            res.status(httpStatus.UNAUTHORIZED).send(
+                {
+                    message:"You can't update someone else cart"
+                })
+        }
+
+        const updatedData = {
+            pid,
+            qty
+        }
+
+        const serviceData = await updateCartService(uid,updatedData)
+
+        if(serviceData.success){
+            return res.status(httpStatus.OK).send({
+                message:serviceData.message,
+                data:serviceData.data
+            })
+        }else{
+            return res.status(httpStatus.BAD_REQUEST).send({
+                message:serviceData.message
+            })
+        }
+
     }else{
-        res.status(500).send({
-            message:serviceData.message
+        res.status(httpStatus.UNAUTHORIZED).send({
+            message:"UserId or ProductId or Qty is missing"
         })
     }
 
@@ -97,6 +139,7 @@ async function updateCartController(req,res){
 
 module.exports = {
     getAllCartController,
+    getUserCartController,
     addCartController,
     updateCartController
 };

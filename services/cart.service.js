@@ -3,12 +3,20 @@ const Cart = require("../models/cart.model");
 async function addCartService(cartData) {
   const isCart = await Cart.findOne({ uid: cartData.uid });
 
-  console.log(isCart);
-
   if (isCart) {
-    const cart = await Cart.findByIdAndUpdate(isCart._id, {
-      $push: { pid: cartData.pid, quantity: cartData.quantity },
-    });
+    const cart = await Cart.findByIdAndUpdate(
+      { _id: isCart._id },
+      {
+        $push: {
+          products: {
+            pid: cartData.pid,
+            qty: cartData.qty,
+          },
+        },
+      },
+      { new: true }
+    );
+
     if (cart) {
       return {
         success: true,
@@ -52,7 +60,7 @@ async function addCartService(cartData) {
 async function getAllCartService() {
   const carts = await Cart.find()
     .populate("uid", "name email mobile")
-    .populate("pid", "name price rating");
+    .populate("products.pid", "name price rating");
   if (carts) {
     return {
       success: true,
@@ -67,22 +75,85 @@ async function getAllCartService() {
   }
 }
 
-// async function getUserCartService(uid){
-//     const carts = await
-// }
+async function getUserCartService(uid) {
+  const cart = await Cart.findOne({ uid })
+    .populate("uid", "name email mobile")
+    .populate("products.pid", "name price rating");
 
-async function updateCartService(cid, updatedCart) {
-  const cart = await Cart.findByIdAndUpdate(cid, updatedCart, { new: true });
   if (cart) {
     return {
       success: true,
-      message: "Cart is updated",
+      message: "Cart is sent",
       data: cart,
     };
   } else {
     return {
       success: false,
-      message: "Cart is not updated",
+      message: "Cart is not available",
+    };
+  }
+}
+
+async function updateCartService(uid, updatedCart) {
+  const cart = await Cart.findOne({
+    uid,
+    products: {
+      $elemMatch: {
+        pid: updatedCart.pid,
+      },
+    },
+  });
+
+  let productId = updatedCart.pid;
+  let qty = updatedCart.qty;
+
+  if (cart) {
+    let products = cart.products;
+
+    if (qty == 0) {
+
+      products = products.filter((elem) => {
+        if (elem.pid != productId) {
+          return true;
+        }
+      });
+
+      cart.products = products;
+
+      const updatedCart = await cart.save();
+
+      return {
+        success: true,
+        message: "Cart is updated",
+        data: updatedCart,
+      };
+
+    }
+
+    products = products.map((elem) => {
+      if (elem.pid == productId) {
+        return {
+          ...elem,
+          qty: qty,
+        };
+      } else {
+        return elem;
+      }
+    });
+
+    cart.products = products;
+
+    const updatedCart = await cart.save();
+
+    return {
+      success: true,
+      message: "Cart is updated",
+      data: updatedCart,
+    };
+  } else {
+    return {
+      success: false,
+      message: "No any such product available in cart",
     };
   }
 }
@@ -90,5 +161,6 @@ async function updateCartService(cid, updatedCart) {
 module.exports = {
   addCartService,
   getAllCartService,
+  getUserCartService,
   updateCartService,
 };
